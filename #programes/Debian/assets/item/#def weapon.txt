@@ -1,0 +1,28 @@
+x#### (item type)
+1 = weapon
+2 = resources
+
+#x### (item class)
+0 = sword
+
+##x## (item sub-class)
+0 = base
+1 = long
+2 = big
+3 = cinqueda
+4 = dragon
+
+###x# (item resources)
+0 = iron
+1 = gold
+2 = diamond
+
+####x (item enchencment)
+0 = nothing
+1 = strength (ruby)
+2 = speed (saphir)
+3 = stamina (amethyst)
+
+
+
+
