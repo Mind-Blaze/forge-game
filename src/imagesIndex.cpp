@@ -115,7 +115,7 @@ Index : numéro des items
 ---------------------------------------
 */
 
-#define mainBackgroundPath "assets/gui/main6.bmp"
+#define mainBackgroundPath "assets/gui/main7.bmp"
 #define shopBackgroundPath "assets/gui/shop3.bmp"
 
 SDL_Texture *texture[68];

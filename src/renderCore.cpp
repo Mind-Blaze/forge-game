@@ -45,7 +45,7 @@ void refreshMain(SDL_Window *window , SDL_Renderer *renderer, int items[], SDL_R
     if(SDL_RenderCopy(renderer,texture[items[19]],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Item 19");
   }
 
-  // affiche la case charbon de la forge
+  // affiche les cases charbon de la forge
   rectangle.x = 161 ScMulti;
   rectangle.y = 86 ScMulti;
   rectangle.w = 16 ScMulti;
@@ -56,6 +56,25 @@ void refreshMain(SDL_Window *window , SDL_Renderer *renderer, int items[], SDL_R
     if(SDL_RenderFillRect(renderer, &rectangle) != 0) SDL_ExitWithError("Impossible crée le rectangle",window,renderer);
     if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
   }
+
+  rectangle.x = 141 ScMulti;
+  rectangle.y = 90 ScMulti;
+  if(SDL_RenderCopy(renderer,texture[coal],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Furnace coal");
+  if(items[33] != coal) { // si c'est vide (ajoute un effect rougeatre)
+    if(SDL_SetRenderDrawColor(renderer,255,100,100,200)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+    if(SDL_RenderFillRect(renderer, &rectangle) != 0) SDL_ExitWithError("Impossible crée le rectangle",window,renderer);
+    if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+  }
+
+  rectangle.x = 181 ScMulti;
+  rectangle.y = 90 ScMulti;
+  if(SDL_RenderCopy(renderer,texture[coal],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Furnace coal");
+  if(items[34] != coal) { // si c'est vide (ajoute un effect rougeatre)
+    if(SDL_SetRenderDrawColor(renderer,255,100,100,200)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+    if(SDL_RenderFillRect(renderer, &rectangle) != 0) SDL_ExitWithError("Impossible crée le rectangle",window,renderer);
+    if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+  }
+
   
   // si un item peut être crafter
   if(canCraft != 0 && craftAnimation == 0){
