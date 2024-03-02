@@ -18,3 +18,5 @@ V0.4.1 : 2.5, fonctionne correctement sous windows
 
 /---------------------------------------
 Nano-forge:
+
+V1.0 : 2.6

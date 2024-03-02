@@ -279,6 +279,11 @@ void buttonPressed(int x, int y, int items[]){
           int temp = items[oldTouch];
           items[oldTouch] = items[currentTouch];
           items[currentTouch] = temp;
+          if(items[16] == coal || items[17] == coal || items[18] == coal){
+            temp = items[oldTouch];
+            items[oldTouch] = items[currentTouch];
+            items[currentTouch] = temp;
+          }
           oldTouch = -1;
           canCrafting(items);
         }

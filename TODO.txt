@@ -34,7 +34,7 @@ Fonctionnalitées mineurs :
 2.5 : rajouter un emplasement de charbon dans la forge (implémenté, verifier les bugs)
 
 2.6 : (nano forge)
-l'utilisateur de doit pas mettre de charbon dans l'espace de craft
+l'utilisateur de doit pas mettre de charbon dans l'espace de craft (implémenté, verifier les bugs)
 
 2.7 : (micro forge) faire clignoter l'emplacement du charbon si l'utilisateur
 click pour fait le craft mais qu'il n'y en a pas
