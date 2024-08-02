@@ -8,7 +8,7 @@
 #define ScMulti *3
 #define mainPathBackground "assets/gui/main5.bmp"
 #define shopPathBackground "assets/gui/shop2.9.bmp"
-
+ 
 
 void SDL_ExitWithError(const char *message);
 void SDL_ExitWithError(const char *message, SDL_Window *window);
@@ -19,14 +19,16 @@ void initTextures(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture *text
 void initTexturesCore(SDL_Window *window , SDL_Renderer *renderer, const char *path, SDL_Texture **texture, int index);
 
 void refresh(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture, int items[], bool page, SDL_Rect *highlightRectangle, TTF_Font *font, SDL_Color *color
-             , int money, int price);
+             , int money, int price, int ask);
 
 void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture, int *money
-                   , TTF_Font *font, SDL_Color *color);
+                   , TTF_Font *font, SDL_Color *color,int *ask, float *level,int *price);
 
 SDL_Rect itemHighlight(int box);
 
 int main(int argc, char *argv[]) {
+
+  srand(time(NULL));
 
   int items[21] = {0};
   items[0] = 66;
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]) {
   if(renderer == NULL) SDL_ExitWithError("Création moteur de rendu");
   if(SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_MUL)) SDL_ExitWithError("Impossible d'acctiver le blendmode",window,renderer);
 
-  if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible d'acctiver le blendmode",window,renderer);
+  if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
 
   
   SDL_Texture *texture[76];
@@ -60,30 +62,47 @@ int main(int argc, char *argv[]) {
   SDL_Color color = { 255, 255, 255 };
 
   int money = 100000;
+  int ask = askGenerator(1,1);
+  float level = 1.5;
 	
-  refresh(window,renderer,texture,items,page,NULL,font,&color,money,0);
+  refresh(window,renderer,texture,items,page,NULL,font,&color,money,0,ask);
 
   SDL_Event event;
   bool programState = true;
-  
+  SDL_Rect tempRect;
+  int price = sellPrice(ask);
 
   while(programState){
     while(SDL_WaitEvent(&event) == 1){
 
       switch(event.type){
         case SDL_MOUSEBUTTONDOWN:
-          buttonPressed(event.motion.x,event.motion.y,items,&oldTouch,&page,window,renderer,texture,&money,font,&color);
+          buttonPressed(event.motion.x,event.motion.y,items,&oldTouch,&page,window,renderer,texture,&money,font,&color,&ask,&level,&price);
           break;
         case SDL_QUIT:
           programState = false;
+          break;
+        case SDL_WINDOWEVENT:
+          switch (event.window.event){
+            case SDL_WINDOWEVENT_EXPOSED:
+              tempRect = itemHighlight(oldTouch);
+              refresh(window,renderer,texture,items,page,&tempRect,font,&color,money,price,ask);
+              break;
+            case SDL_WINDOWEVENT_MOVED:
+              tempRect = itemHighlight(oldTouch);
+              refresh(window,renderer,texture,items,page,&tempRect,font,&color,money,price,ask);
+              break;
+          }
           break;
         default:
           break;
 
       }
-      
       if(!programState){
         break;
+      }
+      if (ask == 0){
+        ask = askGenerator(level,money);
       }
 
     }
@@ -92,7 +111,6 @@ int main(int argc, char *argv[]) {
   TTF_CloseFont(font);
   TTF_Quit();
   SDL_DestroyTexture(*texture);
-  SDL_DestroyRenderer(renderer);  
   SDL_DestroyWindow(window);
   SDL_Quit();
 
@@ -101,9 +119,10 @@ int main(int argc, char *argv[]) {
 }
 
 void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture, int *money
-                   , TTF_Font *font, SDL_Color *color){
+                   , TTF_Font *font, SDL_Color *color, int *ask, float *level, int *price){
 
   int currentTouch = -1;
+  int buyPrice = 0;
 
   if( x > 16 ScMulti && y > 128 ScMulti && x < 48 ScMulti && y < 160 ScMulti) currentTouch = 0;
   else if( x > 75 ScMulti && y > 128 ScMulti && x < 107 ScMulti && y < 160 ScMulti) currentTouch = 1;
@@ -148,23 +167,23 @@ void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Wind
     else if( x > 193 ScMulti && y > 44 ScMulti && x < 225 ScMulti && y < 76 ScMulti) currentTouch = 19;
   }
 
-  int price = 0;
   if(*page){
     if (x > 193 ScMulti && y > 44 ScMulti && x < 225 ScMulti && y < 76 ScMulti) currentTouch = 20;
 
-    else if( x > 68 ScMulti && y > 39 ScMulti && x < 84 ScMulti && y < 55 ScMulti){ currentTouch = 21; price = ironPrice;}
-    else if( x > 100 ScMulti && y > 39 ScMulti && x < 116 ScMulti && y < 55 ScMulti){ currentTouch = 22; price = goldPrice;}
-    else if( x > 132 ScMulti && y > 39 ScMulti && x < 148 ScMulti && y < 55 ScMulti){ currentTouch = 23; price = copperPrice;}
+    else if( x > 68 ScMulti && y > 39 ScMulti && x < 84 ScMulti && y < 55 ScMulti) { currentTouch = 21; buyPrice = ironPrice;}
+    else if( x > 100 ScMulti && y > 39 ScMulti && x < 116 ScMulti && y < 55 ScMulti) { currentTouch = 22; buyPrice = goldPrice;}
+    else if( x > 132 ScMulti && y > 39 ScMulti && x < 148 ScMulti && y < 55 ScMulti) { currentTouch = 23; buyPrice = copperPrice;}
 
-    else if( x > 68 ScMulti && y > 65 ScMulti && x < 84 ScMulti && y < 81 ScMulti){ currentTouch = 24; price = diamondPrice;}
-    else if( x > 100 ScMulti && y > 65 ScMulti && x < 116 ScMulti && y < 81 ScMulti){ currentTouch = 25; price = rubyPrice;}
-    else if( x > 132 ScMulti && y > 65 ScMulti && x < 148 ScMulti && y < 81 ScMulti){ currentTouch = 26; price = saphirPrice;}
-    else if( x > 159 ScMulti && y > 52 ScMulti && x < 175 ScMulti && y < 68 ScMulti){ currentTouch = 28; price = amethystePrice;}
+    else if( x > 68 ScMulti && y > 65 ScMulti && x < 84 ScMulti && y < 81 ScMulti) { currentTouch = 24; buyPrice = diamondPrice;}
+    else if( x > 100 ScMulti && y > 65 ScMulti && x < 116 ScMulti && y < 81 ScMulti) { currentTouch = 25; buyPrice = rubyPrice;}
+    else if( x > 132 ScMulti && y > 65 ScMulti && x < 148 ScMulti && y < 81 ScMulti) { currentTouch = 26; buyPrice = saphirPrice;}
+    else if( x > 159 ScMulti && y > 52 ScMulti && x < 175 ScMulti && y < 68 ScMulti) { currentTouch = 28; buyPrice = amethystePrice;}
 
     
 
     else if( x > 9 ScMulti && y > 34 ScMulti && x < 51 ScMulti && y < 58 ScMulti) currentTouch = 29;
     else if( x > 9 ScMulti && y > 62 ScMulti && x < 51 ScMulti && y < 86 ScMulti) currentTouch = 30;
+
   }
 
 
@@ -198,7 +217,6 @@ void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Wind
         *oldTouch = currentTouch;
         rectangle = itemHighlight(currentTouch);
         rectangleState = true;
-        rectangleState = 1;
       }
       else{
         int temp = items[*oldTouch];
@@ -211,7 +229,6 @@ void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Wind
       *oldTouch = currentTouch;
       rectangle = itemHighlight(currentTouch);
       rectangleState = true;
-      rectangleState = 1;
     }
   }
   else if(currentTouch >= 21 && currentTouch <= 28){
@@ -224,39 +241,28 @@ void buttonPressed(int x, int y, int items[],int *oldTouch, bool *page, SDL_Wind
     buy(items,money,*oldTouch);
     *oldTouch = -1;
   }
-  else if(currentTouch == 30 && items[20] != 0){
-    *money = *money + sellPrice(items[20]);
+  else if(currentTouch == 30 && items[20] == *ask){
+    *money = *money + *price;
+    *ask = askGenerator((int)*level,*money);
+    *price = sellPrice(*ask);
     items[20] = 0;
   }
   else if(currentTouch != -1 && currentTouch != -2 && currentTouch != *oldTouch){
     *oldTouch = currentTouch;
     rectangle = itemHighlight(currentTouch);
   }
-  else if(currentTouch == -1){
+  else if(currentTouch == *oldTouch){
     *oldTouch = -1;
-  }
-
-  if(items[20] != 0 ){
-    price = sellPrice(items[20]);
   }
 
   
   if(rectangleState){
-    switch(*page){
-      case 0:
-        refresh(window,renderer,texture,items,*page,&rectangle,font,color,*money,0);
-      case 1:
-        refresh(window,renderer,texture,items,*page,&rectangle,font,color,*money,price);
-    }
-    
+    if (buyPrice != 0) refresh(window,renderer,texture,items,*page,&rectangle,font,color,*money,buyPrice,*ask);
+    else refresh(window,renderer,texture,items,*page,&rectangle,font,color,*money,*price,*ask);
   }
   else{
-    switch(*page){
-      case 0:
-        refresh(window,renderer,texture,items,*page,NULL,font,color,*money,0);
-      case 1:
-        refresh(window,renderer,texture,items,*page,NULL,font,color,*money,price);
-    }
+    if (buyPrice != 0) refresh(window,renderer,texture,items,*page,NULL,font,color,*money,buyPrice,*ask);
+    else refresh(window,renderer,texture,items,*page,NULL,font,color,*money,*price,*ask);
   }
 
   std::cout << "  >>>  " << currentTouch << " ; " << *oldTouch << "\n";
@@ -414,7 +420,7 @@ SDL_Rect itemHighlight(int box){
 
 
 void refresh(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture, int items[], bool page, SDL_Rect *highlightRectangle, TTF_Font *font, SDL_Color *color
-             , int money, int price){
+             , int money, int price, int ask){
 
   SDL_RenderClear(renderer);
 
@@ -485,7 +491,7 @@ void refresh(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture,
     
 
     
-    char moneyChar[6];
+    char moneyChar[10];
     sprintf(moneyChar,"%d",money);
     SDL_Surface *surface = TTF_RenderText_Solid(font,moneyChar, *color);
     if(surface == NULL) SDL_ExitWithError("Impossible de crée la surface",window,renderer);
@@ -498,7 +504,7 @@ void refresh(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture,
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(moneyText);
 
-    char priceChar[6];
+    char priceChar[10];
     sprintf(moneyChar,"%d",price);
     surface = TTF_RenderText_Solid(font,moneyChar, *color);
     if(surface == NULL) SDL_ExitWithError("Impossible de crée la surface",window,renderer);
@@ -516,7 +522,22 @@ void refresh(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **texture,
     rectangle.h = 32 ScMulti;
     rectangle.x = 193 ScMulti;
     rectangle.y = 44 ScMulti;
-    if(SDL_RenderCopy(renderer,texture[items[20]],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Item 20");
+    
+    if (items[20] != 0){
+      if(SDL_RenderCopy(renderer,texture[items[20]],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Item 20");
+    }
+    else{
+      if(SDL_SetRenderDrawColor(renderer,0,0,0,100)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+      if(SDL_RenderCopy(renderer,texture[ask],NULL, &rectangle) != 0) SDL_ExitWithError("Impossible de charger la texture à l'écran",window,renderer,"Item 20");
+      SDL_RenderFillRect(renderer,&rectangle);
+      if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+    }
+
+    if(items[20] >= 2 && items[20] != ask){
+      if(SDL_SetRenderDrawColor(renderer,255,100,100,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+      SDL_RenderFillRect(renderer,&rectangle);
+      if(SDL_SetRenderDrawColor(renderer,255,255,255,150)) SDL_ExitWithError("Impossible de changer de couleur",window,renderer);
+    }
 
   }
 
@@ -589,7 +610,7 @@ void initTextures(SDL_Window *window , SDL_Renderer *renderer, SDL_Texture **tex
   int i = 0;
 
   initTexturesCore(window,renderer,"assets/resource/0.bmp",texture,0);
-  initTexturesCore(window,renderer,"assets/item/10423.bmp",texture,1);
+  //initTexturesCore(window,renderer,"assets/resource/1.bmp",texture,1);
   initTexturesCore(window,renderer,"assets/item/10000.bmp",texture,2);
   initTexturesCore(window,renderer,"assets/item/10001.bmp",texture,3);
   initTexturesCore(window,renderer,"assets/item/10002.bmp",texture,4);

@@ -7,7 +7,6 @@
 #define saphirPrice 30
 #define amethystePrice 30
 
-
 #define ironIndex 66
 #define goldIndex 67
 #define diamondIndex 68
@@ -15,6 +14,8 @@
 #define rubyIndex 70
 #define saphirIndex 71
 #define amethysteIndex 72
+
+#define avergePrice *(float)(1+(rand()%10-5)/(float)100);
 
 // int outItem = items[19];
 bool craftingCore(int inItems[], int itemCheck1, int itemCheck2, int itemCheck3);
@@ -49,12 +50,53 @@ void buy(int items[], int *money, int selectedItem){
     *money -= amethystePrice;
     items[20] = 72;
   }
-  else if(selectedItem == 27){ // coal
-    *money -= 5;
-    items[20] = 73;
+
+}
+
+int askGenerator(int level, int money){
+
+	if(level == 1){
+		return rand() % 11 + 2;
+	}
+	else if(level == 2 && money >= 200){
+		return rand() % 27 + 2;
+	}
+	else if(level == 3 && money >= 350){
+		return rand() % 35 + 2;
+	}
+	else if(level == 4 && money >= 700){
+		return rand() % 47 + 2;
+	}
+	else if(level == 54 && money >= 1700){
+		return rand() % 55 + 2;
+	}
+
+  return 0;
+}
+
+void levelUpdate(float *level){
+
+  switch((int)*level){
+    case 1:
+      *level += 0.1;
+      break;
+    case 2:
+      *level += 0.075;
+      break;
+    case 3:
+      *level += 0.05;
+      break;
+    case 4:
+      *level += 0.04;
+      break;
+    case 5:
+      *level += 0.025;
+      break;
   }
 
 }
+
+
 
 int sellPrice(int item){
 
@@ -62,70 +104,62 @@ int sellPrice(int item){
 
   switch (item)
   {
-    case 2: return 20; break;
-    case 3: return 60; break;
-    case 4: return 60; break;
-    case 5: return 60; break;
-    case 6: return 45; break;
-    case 7: return 80; break;
-		case 8: return 80; break;
-		case 9: return 80; break;
-		case 10: return 95; break;
-		case 11: return 130; break;
-		case 12: return 130; break;
-		case 13: return 130; break;
-		case 14: return 30; break;
-    case 15: return 70; break;
-    case 16: return 70; break;
-    case 17: return 70; break;
-    case 18: return 65; break;
-    case 19: return 100; break;
-    case 20: return 100; break;
-    case 21: return 100; break;
-    case 22: return 150; break;
-		case 23: return 185; break;
-		case 24: return 185; break;
-		case 25: return 185; break;
-		case 26: return 50; break;
-    case 27: return 90; break;
-    case 28: return 90; break;
-    case 29: return 90; break;
-    case 30: return 125; break;
-    case 31: return 160; break;
-    case 32: return 160; break;
-    case 33: return 160; break;
-    case 34: return 290; break;
-		case 35: return 340; break;
-		case 36: return 340; break;
-		case 37: return 340; break;
-		case 38: return 110; break;
-    case 39: return 150; break;
-    case 40: return 150; break;
-    case 41: return 150; break;
-    case 42: return 270; break;
-    case 43: return 420; break;
-    case 44: return 420; break;
-    case 45: return 420; break;
-    case 46: return 650; break;
-		case 47: return 680; break;
-		case 48: return 680; break;
-		case 49: return 680; break;
-		case 50: return 550; break;
-    case 51: return 600; break;
-    case 52: return 600; break;
-    case 53: return 600; break;
-    case 54: return 1800; break;
-    case 55: return 2000; break;
-		case 56: return 2000; break;
-		case 57: return 2000; break;
-    
-    case ironIndex: return ironPrice; break;
-    case goldIndex: return goldPrice; break;
-    case diamondIndex: return diamondPrice; break;
-    case copperIndex: return copperPrice; break;
-    case rubyIndex: return rubyPrice; break;
-    case saphirIndex: return saphirPrice; break;
-		case amethysteIndex: return amethystePrice; break;
+    case 2: return 20 avergePrice; break;
+    case 3: return 60 avergePrice; break;
+    case 4: return 60 avergePrice; break;
+    case 5: return 60 avergePrice; break;
+    case 6: return 45 avergePrice; break;
+    case 7: return 80 avergePrice; break;
+		case 8: return 80 avergePrice; break;
+		case 9: return 80 avergePrice; break;
+		case 10: return 95 avergePrice; break;
+		case 11: return 130 avergePrice; break;
+		case 12: return 130 avergePrice; break;
+		case 13: return 130 avergePrice; break;
+		case 14: return 30 avergePrice; break;
+    case 15: return 70 avergePrice; break;
+    case 16: return 70 avergePrice; break;
+    case 17: return 70 avergePrice; break;
+    case 18: return 65 avergePrice; break;
+    case 19: return 100 avergePrice; break;
+    case 20: return 100 avergePrice; break;
+    case 21: return 100 avergePrice; break;
+    case 22: return 150 avergePrice; break;
+		case 23: return 185 avergePrice; break;
+		case 24: return 185 avergePrice; break;
+		case 25: return 185 avergePrice; break;
+		case 26: return 50 avergePrice; break;
+    case 27: return 90 avergePrice; break;
+    case 28: return 90 avergePrice; break;
+    case 29: return 90 avergePrice; break;
+    case 30: return 125 avergePrice; break;
+    case 31: return 160 avergePrice; break;
+    case 32: return 160 avergePrice; break;
+    case 33: return 160 avergePrice; break;
+    case 34: return 290 avergePrice; break;
+		case 35: return 340 avergePrice; break;
+		case 36: return 340 avergePrice; break;
+		case 37: return 340 avergePrice; break;
+		case 38: return 110 avergePrice; break;
+    case 39: return 150 avergePrice; break;
+    case 40: return 150 avergePrice; break;
+    case 41: return 150 avergePrice; break;
+    case 42: return 270 avergePrice; break;
+    case 43: return 420 avergePrice; break;
+    case 44: return 420 avergePrice; break;
+    case 45: return 420 avergePrice; break;
+    case 46: return 650 avergePrice; break;
+		case 47: return 680 avergePrice; break;
+		case 48: return 680 avergePrice; break;
+		case 49: return 680 avergePrice; break;
+		case 50: return 550 avergePrice; break;
+    case 51: return 600 avergePrice; break;
+    case 52: return 600 avergePrice; break;
+    case 53: return 600 avergePrice; break;
+    case 54: return 1800 avergePrice; break;
+    case 55: return 2000 avergePrice; break;
+		case 56: return 2000 avergePrice; break;
+		case 57: return 2000 avergePrice; break;
   }
   
   return -1;
@@ -141,7 +175,6 @@ void crafting(int items[]){
   // 70 = ruby
   // 71 = saphir
   // 72 = amethyste
-  // 73 = coal
   
   
   // stage 1
