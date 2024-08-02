@@ -3,7 +3,7 @@ Légande :
 1.x = bugs
 2.x = Fonctionnalitées mineurs
 3.x = Fonctionnalitées majeurs
-4.x = Fonctionnalitées majeurs ++
+4.x = Fonctionnalitées majeurs ++ (en bref, l'implémentation dépendera de ma flemme)
 
 
 
@@ -31,20 +31,19 @@ Fonctionnalitées mineurs :
 
 2.4 : ne pas avoir plus de 2 fois la même demande (implémenté, verifier les bugs)
 
-2.5 : (nano forge)
-rajouter un emplasement de charbon dans la forge
+2.5 : rajouter un emplasement de charbon dans la forge (implémenté, verifier les bugs)
 
 2.6 : (nano forge)
 l'utilisateur de doit pas mettre de charbon dans l'espace de craft
 
 2.7 : (micro forge) faire clignoter l'emplacement du charbon si l'utilisateur
 click pour fait le craft mais qu'il n'y en a pas
--> si de même si l'utilisateur click si il y a un craft en cours
+-> de même si l'utilisateur click si il y a un craft en cours
 
 
 
 /---------------------------------------
-Fonctionnalitées majeurs : 
+Fonctionnalitées majeurs :
 
 3.1 : Augementer la chance de demande d'items complex suivant le niveau du joueur (implémenté, verifier les bugs)
 

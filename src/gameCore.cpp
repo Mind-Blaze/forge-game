@@ -304,10 +304,17 @@ void crafting(int items[]){
 
   craftingTime = baseCraftingTime * coalNeeded;
 
-  
+  int coalIndex = 0;
+  for(int i = 2; i >= 0; i--){
+    if(items[32+i] == coal){
+      coalIndex = 32 + i;
+      break;
+    }
+  }
+
   if(oldCoalUsage == 0){
-    if(items[32] == coal){
-      items[32] = nullIndex;
+    if(coalIndex){
+      items[coalIndex] = nullIndex;
       oldCoalUsage++;
       canContunueCraftAnimation = 1;
       craftAnimationStartTime = SDL_GetTicks();
@@ -316,8 +323,8 @@ void crafting(int items[]){
   else{
     if(craftAnimationState >= (int) (oldCoalUsage * 40 / coalNeeded)){
       canContunueCraftAnimation = 0;
-      if(items[32] == coal){
-        items[32] = nullIndex;
+      if(coalIndex){
+        items[coalIndex] = nullIndex;
         oldCoalUsage++;
         canContunueCraftAnimation = 1;
         craftAnimationStartTime = SDL_GetTicks() - craftAnimationState * craftingTime / 39;
@@ -338,7 +345,6 @@ void crafting(int items[]){
     canContunueCraftAnimation = 0;
     oldCoalUsage = 0;
   }
-
 }
 
 // vérifie si un item peut être craft

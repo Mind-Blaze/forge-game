@@ -3,3 +3,5 @@ V0.2 : Demande spécifique dans le shop avec des prix variable et différents pa
 V0.3.1 : code commenté, refonte du système de détéction des clicks et du double click pour déplacer les obj rappidement et besoin de charbon pour la forge et tout les items sont vendable mais a un prix réduit si il ne sont pas demendé
 
 V0.4 : 2.1, 2.2, 2.3, 2.4, 3.1, bug double-click corrigé, équilibrage
+
+V0.4.1 : 2.5

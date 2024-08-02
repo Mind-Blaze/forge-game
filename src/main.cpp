@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   
   money = 300;
 
-  int items[33] = {0};
+  int items[34] = {0};
   items[0] = iron;
   items[1] = copper;
   items[2] = copper;
@@ -216,7 +216,9 @@ int witchCase(int x, int y){
 
     else if( x > 149 ScMulti && y > 48 ScMulti && x < 188 ScMulti && y < 73 ScMulti) currentTouch = 31;
 
-    else if( x > 161 ScMulti && y > 86 ScMulti && x < 177 ScMulti && y < 102 ScMulti) currentTouch = 32;
+    else if( x > 161 ScMulti && y > 86 ScMulti && x < 177 ScMulti && y < 106 ScMulti) currentTouch = 32;
+    else if( x > 141 ScMulti && y > 90 ScMulti && x < 157 ScMulti && y < 106 ScMulti) currentTouch = 33;
+    else if( x > 181 ScMulti && y > 90 ScMulti && x < 197 ScMulti && y < 106 ScMulti) currentTouch = 34;
   }
 
   if(page){
@@ -280,7 +282,7 @@ void buttonPressed(int x, int y, int items[]){
           oldTouch = -1;
           canCrafting(items);
         }
-        else if(oldTouch == 32 && items[oldTouch] == 0 && items[currentTouch] == coal){ // permet d'échanger avec l'emplacement charbon de la forge
+        else if(oldTouch >= 32 && oldTouch <= 34 && items[oldTouch] == 0 && items[currentTouch] == coal){ // permet d'échanger avec l'emplacement charbon de la forge
           int temp = items[oldTouch];
           items[oldTouch] = items[currentTouch];
           items[currentTouch] = temp;
@@ -304,14 +306,14 @@ void buttonPressed(int x, int y, int items[]){
           oldTouch = currentTouch;
         }
       }
-      else if(currentTouch == 32){  // permet de mettre du charbon dans la forge, uniquement vers la forge
+      else if(currentTouch >= 32 && currentTouch <= 34){  // permet de mettre du charbon dans la forge, uniquement vers la forge
         if(items[oldTouch] == coal){
           int temp = items[oldTouch];
           items[oldTouch] = items[currentTouch];
           items[currentTouch] = temp;
           oldTouch = -1;
         }
-        else if(clicks == 2){
+        else if(clicks == 2 && items[oldTouch] == coal){
           doubleClick(items,currentTouch);
         }
         else{
@@ -420,11 +422,15 @@ void doubleClick(int *items, int currentTouch){
   if(clicks == 2 && items[currentTouch] != 0 && currentTouch >= 0){
     if(currentTouch <= 15){
       if(!page && items[currentTouch] == coal){
-        int temp = items[32];
-        items[32] = items[currentTouch];
-        items[currentTouch] = temp;
+        for(int i = 0; i < 3; i++){
+          if(items[32+i] == 0){
+            items[32+i] = items[currentTouch];
+            items[currentTouch] = 0;
+            break;
+          }
+        }
       }
-      if(!page){
+      else if(!page){
         for(int i = 16; i <= 18; i++){
           if(items[i] == 0){
             int temp = items[i];
