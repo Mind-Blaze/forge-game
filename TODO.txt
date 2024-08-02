@@ -1,0 +1,81 @@
+Légande :
+
+1.x = bugs
+2.x = Fonctionnalitées mineurs
+3.x = Fonctionnalitées majeurs
+4.x = Fonctionnalitées majeurs ++
+
+
+
+
+/---------------------------------------
+Bug : Fonctionnalitées majeurs
+
+1.1 : verifier que le systeme de demande fonctionne : plus aucune demande n'est
+aparut (redémarage du programe requis) (à l'aire ok)
+
+encore ce saleté double click (à l'aire ok)
+
+
+
+
+
+/---------------------------------------
+Fonctionnalitées mineurs :
+
+2.1 : quand on passe un niveau faire en sorte qu'un des items débloquer soit demendé (implémenté, ok)
+
+2.2 : mettre l'épée de fer avec le ruby comme 1er demande (implémenté, inutile)
+
+2.3 : remettre automatiquement le dernier item acheté dans l'inv si possible (implémenté, verifier les bugs)
+
+2.4 : ne pas avoir plus de 2 fois la même demande (implémenté, verifier les bugs)
+
+2.5 : (nano forge)
+rajouter un emplasement de charbon dans la forge
+
+2.6 : (nano forge)
+l'utilisateur de doit pas mettre de charbon dans l'espace de craft
+
+2.7 : (micro forge) faire clignoter l'emplacement du charbon si l'utilisateur
+click pour fait le craft mais qu'il n'y en a pas
+-> si de même si l'utilisateur click si il y a un craft en cours
+
+
+
+/---------------------------------------
+Fonctionnalitées majeurs : 
+
+3.1 : Augementer la chance de demande d'items complex suivant le niveau du joueur (implémenté, verifier les bugs)
+
+(3.2 : micro forge)
+Rework du système d'items : utiliser la programation orienté objet
+
+3.3 : (micro forge)(nécécite le rework du systeme d'items)
+Rajouter des items à craft
+-> (micro forge) rajouter des materieaux à craft, notament pour améliorer la forge
+
+3.4 : (micro forge)
+Afficher le craft quand un click gauche est effectué sur un items
+-> affihcer le nb d'items de base à avoir pour y arriver
+
+3.5 : (micro forge)(nécécite l'ajout d'item à craft)
+rajouter différants niveau de forge
+
+3.6 : (micro forge)
+rajouter un systeme de sauvegarde
+
+3.7 : (micro forge)
+Ajouter la possibilité d'utiliser le clavier
+-> touches à définir
+
+3.8 : (micro forge)
+un même craft peut avoir différants résultat
+-> ajouter un boutton pour choisir
+
+4.1 : (micro forge)
+menu principal ?
+
+4.2 : (micro forge)
+tuto ?
+

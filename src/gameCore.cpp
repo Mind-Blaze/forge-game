@@ -9,7 +9,7 @@
 #define coalPrice 5
 
 
-
+// + ou - 5%
 #define avergeAskPrice *(float)(1+(rand()%10-5)/(float)100);
 
 // int outItem = items[19];
@@ -17,39 +17,39 @@ bool craftingCore(int inItems[], int itemCheck1, int itemCheck2, int itemCheck3)
 
 
 // effectue l'acction d'achetterr un item
-void buy(int items[], int selectedItem){
+void buy(int items[], int selectedItem, int place = 20){
 
   if(selectedItem == 21){ // iron
     money -= ironPrice;
-    items[20] = iron;
+    items[place] = iron;
   }
   else if(selectedItem == 22){ // gold
     money -= goldPrice;
-    items[20] = gold;
+    items[place] = gold;
   }
   else if(selectedItem == 23){ // diamond
     money -= diamondPrice;
-    items[20] = diamond;
+    items[place] = diamond;
   }
   else if(selectedItem == 24){ // copper
     money -= copperPrice;
-    items[20] = copper;
+    items[place] = copper;
   }
   else if(selectedItem == 25){ // ruby
     money -= rubyPrice;
-    items[20] = ruby;
+    items[place] = ruby;
   }
   else if(selectedItem == 26){ // sahpir
     money -= saphirPrice;
-    items[20] = saphir;
+    items[place] = saphir;
   }
   else if(selectedItem == 27){ // amethyste
     money -= amethystePrice;
-    items[20] = amethyste;
+    items[place] = amethyste;
   }
   else if(selectedItem == 28){ // coal
     money -= coalPrice;
-    items[20] = coal;
+    items[place] = coal;
   }
 
 }
@@ -88,29 +88,92 @@ int buyPrice(int nb){
 }
 
 // génère une demande
-int askGenerator(int level, int money){
-
-	if(level == 1){
-		return rand() % 11 + baseIronSword;
-	}
-	else if(level == 2 && money >= 250){
-		return rand() % 27 + baseIronSword;
-	}
-	else if(level == 3 && money >= 400){
-		return rand() % 35 + baseIronSword;
-	}
-	else if(level == 4 && money >= 750){
-		return rand() % 47 + baseIronSword;
-	}
-	else if(level == 5 && money >= 2000){
-		return rand() % 55 + baseIronSword;
-	}
+int askGenerator(int level, int money, bool levelUpdateState){
   
-  return 0;
+  int newAsk = -1;
+  int list[] = {1,2,2,3,3,3,4,4,4,4,5,5,5,5,5};
+  // liste de multiplicateur pour augementer l'apparition de demande complex
+  if(!levelUpdateState){
+    do{
+      if(level == 1){                      // [11;22] (12 item)
+        newAsk = rand() % 12 + baseIronSword;
+      }
+      else if(level == 2 && money >= 250){ // [23;34] (12 item)
+        int numlist = rand() % 3; // multiplicateur 
+        int num1 = rand() % 12; // nb de 0 à 11
+        newAsk = num1 + 12 * (list[numlist] -1 ) + baseIronSword;
+      }
+      else if(level == 3 && money >= 450){ // [35;46] (12 item)
+        int numlist = rand() % 6;// multiplicateur 
+        int num1 = rand() % 12; // nb de 0 à 11
+        newAsk = num1 + 12 * (list[numlist] -1 ) + baseIronSword;
+      }
+      else if(level == 4 && money >= 800){ // [47;58] (12 item)
+        int numlist = rand() % 10;// multiplicateur 
+        int num1 = rand() % 12; // nb de 0 à 11
+        newAsk = num1 + 12 * (list[numlist] -1 ) + baseIronSword;
+      }
+      else if(level == 5 && money >= 900){ //[59;66] (8 item)
+        int numlist = rand() % 15;// multiplicateur 
+        int num1 = 0;
+        if (numlist == 5){
+          int num1 = rand() % 4; // nb de 0 à 3
+        }
+        else{
+          int num1 = rand() % 12; // nb de 0 à 11
+        }
+        newAsk = num1 + 12 * (list[numlist] -1 ) + baseIronSword;
+      }
+      else if(level == 5 && money >= 2500){ //[59;66] (8 item)
+        int numlist = rand() % 15;// multiplicateur 
+        int num1 = 0;
+        if (numlist == 5){
+          int num1 = rand() % 8; // nb de 0 à 7
+        }
+        else{
+          int num1 = rand() % 12; // nb de 0 à 11
+        }
+        newAsk = num1 + 12 * (list[numlist] -1 ) + baseIronSword;
+      }
+    }while (newAsk == ask);
+  }
+  else if(levelUpdateState){
+    do{
+      if(level == 1){                      // [11;22] (12 item)
+        newAsk = rand() % 12 + baseIronSword;
+      }
+      else if(level == 2 && money >= 250){ // [23;34] (12 item)
+        newAsk = rand() % 12 + longIronSword;
+      }
+      else if(level == 3 && money >= 450){ // [35;46] (12 item)
+        newAsk = rand() % 12 + bigIronSword;
+      }
+      else if(level == 4 && money >= 800){ // [47;58] (12 item)
+        newAsk = rand() % 12 + cinquedaIronSword;
+      }
+      else if(level == 5 && money >= 900){ //[59;66] (8 item)
+        newAsk = rand() % 4 + dragonGoldSword;
+      }
+      else if(level == 5 && money >= 2500){ //[59;66] (8 item)
+        newAsk = rand() % 4 + dragonDiamondSword;
+      }
+    }while (newAsk == ask);
+  }
+
+
+  if (newAsk == -1){
+    std::cout << "askGenerator Error\n";
+    newAsk = baseIronSword;
+  }
+  
+  return newAsk;
 }
 
 // augemente l'xp quand une item vendu est demendé : augemente la difficulté de craft
-void levelUpdate(){
+// le niveau est représenté par le nombre entier
+int levelUpdate(){
+
+  int oldLevel = (int)level;
 
   switch((int)level){
     case 1:
@@ -120,15 +183,17 @@ void levelUpdate(){
       level += 0.15;
       break;
     case 3:
-      level += 0.01;
+      level += 0.075;
       break;
     case 4:
-      level += 0.08;
+      level += 0.04;
       break;
     case 5:
-      level += 0.05;
+      level += 0.01;
       break;
   }
+
+  return level-oldLevel; // renvoie 1 si le niveau à augemanté
 
 }
 
@@ -149,70 +214,71 @@ int sellPrice(int item, bool type){
 		case -2: itemPrice = amethystePrice; break;
 		case -1: itemPrice = coalPrice; break;
 
-    case baseIronSword:                 itemPrice = 25; break;
-    case baseIronRubySword:             itemPrice = 70; break;
-    case baseIronSaphirSword:           itemPrice = 70; break;
-    case baseIronAmethysteSword:        itemPrice = 70; break;
-    case baseGoldSword:                 itemPrice = 55; break;
-    case baseGoldRubySword:             itemPrice = 95; break;
-		case baseGoldSaphirSword:           itemPrice = 95; break;
-		case baseGoldAmethysteSword:        itemPrice = 95; break;
-		case baseDiamondSword:              itemPrice = 105; break;
-		case baseDiamondRubySword:          itemPrice = 150; break;
-		case baseDiamondSaphirSword:        itemPrice = 150; break;
-		case baseDiamondAmethysteSword:     itemPrice = 150; break;
+    case baseIronSword:                 itemPrice = 20*1.2; break;
+    case baseIronRubySword:             itemPrice = 60*1.2; break;
+    case baseIronSaphirSword:           itemPrice = 60*1.2; break;
+    case baseIronAmethysteSword:        itemPrice = 60*1.2; break;
+    case baseGoldSword:                 itemPrice = 45*1.2; break;
+    case baseGoldRubySword:             itemPrice = 85*1.2; break;
+		case baseGoldSaphirSword:           itemPrice = 85*1.2; break;
+		case baseGoldAmethysteSword:        itemPrice = 85*1.2; break;
+		case baseDiamondSword:              itemPrice = 100*1.2; break;
+		case baseDiamondRubySword:          itemPrice = 140*1.2; break;
+		case baseDiamondSaphirSword:        itemPrice = 140*1.2; break;
+		case baseDiamondAmethysteSword:     itemPrice = 140*1.2; break;
 
-		case longIronSword:                 itemPrice = 40; break;
-    case longIronRubySword:             itemPrice = 85; break;
-    case longIronSaphirSword:           itemPrice = 85; break;
-    case longIronAmethysteSword:        itemPrice = 85; break;
-    case longGoldSword:                 itemPrice = 80; break;
-    case longGoldRubySword:             itemPrice = 120; break;
-    case longGoldSaphirSword:           itemPrice = 120; break;
-    case longGoldAmethysteSword:        itemPrice = 120; break;
-    case longDiamondSword:              itemPrice = 170; break;
-		case longDiamondRubySword:          itemPrice = 210; break;
-		case longDiamondSaphirSword:        itemPrice = 210; break;
-		case longDiamondAmethysteSword:     itemPrice = 210; break;
+		case longIronSword:                 itemPrice = 40*1.2; break;
+    case longIronRubySword:             itemPrice = 85*1.2; break;
+    case longIronSaphirSword:           itemPrice = 85*1.2; break;
+    case longIronAmethysteSword:        itemPrice = 85*1.2; break;
+    case longGoldSword:                 itemPrice = 75*1.2; break;
+    case longGoldRubySword:             itemPrice = 120*1.2; break;
+    case longGoldSaphirSword:           itemPrice = 120*1.2; break;
+    case longGoldAmethysteSword:        itemPrice = 120*1.2; break;
+    case longDiamondSword:              itemPrice = 160*1.2; break;
+		case longDiamondRubySword:          itemPrice = 205*1.2; break;
+		case longDiamondSaphirSword:        itemPrice = 205*1.2; break;
+		case longDiamondAmethysteSword:     itemPrice = 205*1.2; break;
 
-		case bigIronSword:                  itemPrice = 70; break;
-    case bigIronRubySword:              itemPrice = 125; break;
-    case bigIronSaphirSword:            itemPrice = 125; break;
-    case bigIronAmethysteSword:         itemPrice = 125; break;
-    case bigGoldSword:                  itemPrice = 155; break;
-    case bigGoldRubySword:              itemPrice = 195; break;
-    case bigGoldSaphirSword:            itemPrice = 195; break;
-    case bigGoldAmethysteSword:         itemPrice = 195; break;
-    case bigDiamondSword:               itemPrice = 330; break;
-		case bigDiamondRubySword:           itemPrice = 385; break;
-		case bigDiamondSaphirSword:         itemPrice = 385; break;
-		case bigDiamondAmethysteSword:      itemPrice = 385; break;
+		case bigIronSword:                  itemPrice = 75*1.2; break;
+    case bigIronRubySword:              itemPrice = 125*1.2; break;
+    case bigIronSaphirSword:            itemPrice = 125*1.2; break;
+    case bigIronAmethysteSword:         itemPrice = 125*1.2; break;
+    case bigGoldSword:                  itemPrice = 155*1.2; break;
+    case bigGoldRubySword:              itemPrice = 205*1.2; break;
+    case bigGoldSaphirSword:            itemPrice = 205*1.2; break;
+    case bigGoldAmethysteSword:         itemPrice = 205*1.2; break;
+    case bigDiamondSword:               itemPrice = 325*1.2; break;
+		case bigDiamondRubySword:           itemPrice = 375*1.2; break;
+		case bigDiamondSaphirSword:         itemPrice = 375*1.2; break;
+		case bigDiamondAmethysteSword:      itemPrice = 375*1.2; break;
 
-		case cinquedaIronSword:             itemPrice = 155; break;
-    case cinquedaIronRubySword:         itemPrice = 200; break;
-    case cinquedaIronSaphirSword:       itemPrice = 200; break;
-    case cinquedaIronAmethysteSword:    itemPrice = 200; break;
-    case cinquedaGoldSword:             itemPrice = 335; break;
-    case cinquedaGoldRubySword:         itemPrice = 390; break;
-    case cinquedaGoldSaphirSword:       itemPrice = 390; break;
-    case cinquedaGoldAmethysteSword:    itemPrice = 390; break;
-    case cinquedaDiamondSword:          itemPrice = 735; break;
-		case cinquedaDiamondRubySword:      itemPrice = 770; break;
-		case cinquedaDiamondSaphirSword:    itemPrice = 770; break;
-		case cinquedaDiamondAmethysteSword: itemPrice = 770; break;
+		case cinquedaIronSword:             itemPrice = 180*1.2; break;
+    case cinquedaIronRubySword:         itemPrice = 235*1.2; break;
+    case cinquedaIronSaphirSword:       itemPrice = 235*1.2; break;
+    case cinquedaIronAmethysteSword:    itemPrice = 235*1.2; break;
+    case cinquedaGoldSword:             itemPrice = 350*1.2; break;
+    case cinquedaGoldRubySword:         itemPrice = 405*1.2; break;
+    case cinquedaGoldSaphirSword:       itemPrice = 405*1.2; break;
+    case cinquedaGoldAmethysteSword:    itemPrice = 405*1.2; break;
+    case cinquedaDiamondSword:          itemPrice = 720*1.2; break;
+		case cinquedaDiamondRubySword:      itemPrice = 775*1.2; break;
+		case cinquedaDiamondSaphirSword:    itemPrice = 775*1.2; break;
+		case cinquedaDiamondAmethysteSword: itemPrice = 775*1.2; break;
 
-		case dragonGoldSword:               itemPrice = 680; break;
-    case dragonGoldRubySword:           itemPrice = 735; break;
-    case dragonGoldSaphirSword:         itemPrice = 735; break;
-    case dragonGoldAmethysteSword:      itemPrice = 735; break;
-    case dragonDiamondSword:            itemPrice = 2200; break;
-    case dragonDiamondRubySword:        itemPrice = 2500; break;
-		case dragonDiamondSaphirSword:      itemPrice = 2500; break;
-		case dragonDiamondAmethysteSword:   itemPrice = 2500; break;
+		case dragonGoldSword:               itemPrice = 730*1.2; break;
+    case dragonGoldRubySword:           itemPrice = 790*1.2; break;
+    case dragonGoldSaphirSword:         itemPrice = 790*1.2; break;
+    case dragonGoldAmethysteSword:      itemPrice = 790*1.2; break;
+    case dragonDiamondSword:            itemPrice = 2205*1.3; break;
+    case dragonDiamondRubySword:        itemPrice = 3000; break;
+		case dragonDiamondSaphirSword:      itemPrice = 3000; break;
+		case dragonDiamondAmethysteSword:   itemPrice = 3000; break;
   }
 
   if(type){ // -10% si il n'est pas demendé
-    itemPrice -= (float)itemPrice*0.1;
+    if(item < baseIronSword) itemPrice *= 0.9;
+    else itemPrice /= 1.3;
   }
   else{ // crée un prix avec un ajustement aléatoire de +-5%
     itemPrice = itemPrice avergeAskPrice;
@@ -283,84 +349,84 @@ void canCrafting(int items[]){
     canCraft = 0;
     
     // stage 1
-    // iron                                                                                                           // cost : 
-    if (craftingCore(items,iron,copper,0)) canCraft = baseIronSword;                                                  // 15 + 5
-    else if (craftingCore(items,baseIronSword,copper,ruby)) canCraft = baseIronRubySword;                             // 50 + 10
-    else if (craftingCore(items,baseIronSword,copper,saphir)) canCraft = baseIronSaphirSword;                         // 50 + 10
-    else if (craftingCore(items,baseIronSword,copper,amethyste)) canCraft = baseIronAmethysteSword;                   // 50 + 10
+    // iron                                                                                                           // cost : base material + coal = total
+    if (craftingCore(items,iron,copper,0)) canCraft = baseIronSword;                                                  // 15 + 5 = 20
+    else if (craftingCore(items,baseIronSword,copper,ruby)) canCraft = baseIronRubySword;                             // 50 + 10 = 60
+    else if (craftingCore(items,baseIronSword,copper,saphir)) canCraft = baseIronSaphirSword;                         // 50 + 10 = 60
+    else if (craftingCore(items,baseIronSword,copper,amethyste)) canCraft = baseIronAmethysteSword;                   // 50 + 10 = 60
     // gold
-    else if (craftingCore(items,baseIronSword,gold,0)) canCraft = baseGoldSword;                                      // 35 + 10
-    else if (craftingCore(items,baseGoldSword,copper,ruby)) canCraft = baseGoldRubySword;                             // 70 + 15
-    else if (craftingCore(items,baseGoldSword,copper,saphir)) canCraft = baseGoldSaphirSword;                         // 70 + 15
-    else if (craftingCore(items,baseGoldSword,copper,amethyste)) canCraft = baseGoldAmethysteSword;                   // 70 + 15
+    else if (craftingCore(items,baseIronSword,gold,0)) canCraft = baseGoldSword;                                      // 35 + 10 = 45
+    else if (craftingCore(items,baseGoldSword,copper,ruby)) canCraft = baseGoldRubySword;                             // 70 + 15 = 85
+    else if (craftingCore(items,baseGoldSword,copper,saphir)) canCraft = baseGoldSaphirSword;                         // 70 + 15 = 85
+    else if (craftingCore(items,baseGoldSword,copper,amethyste)) canCraft = baseGoldAmethysteSword;                   // 70 + 15 = 85
     // diamond
-    else if (craftingCore(items,baseGoldSword,diamond,0)) canCraft = baseDiamondSword;								                // 85 + 15
-    else if (craftingCore(items,baseDiamondSword,copper,ruby)) canCraft = baseDiamondRubySword;				                // 120 + 20
-    else if (craftingCore(items,baseDiamondSword,copper,saphir)) canCraft = baseDiamondSaphirSword;			              // 120 + 20
-    else if (craftingCore(items,baseDiamondSword,copper,amethyste)) canCraft = baseDiamondAmethysteSword;		          // 120 + 20
+    else if (craftingCore(items,baseGoldSword,diamond,0)) canCraft = baseDiamondSword;								                // 85 + 15 = 100
+    else if (craftingCore(items,baseDiamondSword,copper,ruby)) canCraft = baseDiamondRubySword;				                // 120 + 20 = 140
+    else if (craftingCore(items,baseDiamondSword,copper,saphir)) canCraft = baseDiamondSaphirSword;			              // 120 + 20 = 140
+    else if (craftingCore(items,baseDiamondSword,copper,amethyste)) canCraft = baseDiamondAmethysteSword;		          // 120 + 20 = 140
 
     // stage 2
     // iron
-    else if (craftingCore(items,baseIronSword,iron,0)) canCraft = longIronSword;			                                // 25 + 10
-    else if (craftingCore(items,longIronSword,copper,ruby)) canCraft = longIronRubySword;                             // 60 + 15
-    else if (craftingCore(items,longIronSword,copper,saphir)) canCraft = longIronSaphirSword;			                    // 60 + 15
-    else if (craftingCore(items,longIronSword,copper,amethyste)) canCraft = longIronAmethysteSword;		                // 60 + 15
+    else if (craftingCore(items,baseIronSword,iron,0)) canCraft = longIronSword;			                                // 25 + 15 = 40
+    else if (craftingCore(items,longIronSword,copper,ruby)) canCraft = longIronRubySword;                             // 60 + 25 = 85
+    else if (craftingCore(items,longIronSword,copper,saphir)) canCraft = longIronSaphirSword;			                    // 60 + 25 = 85
+    else if (craftingCore(items,longIronSword,copper,amethyste)) canCraft = longIronAmethysteSword;		                // 60 + 25 = 85
     // gold
-    else if (craftingCore(items,baseGoldSword,gold,0)) canCraft = longGoldSword;									                    // 55 + 15
-    else if (craftingCore(items,longGoldSword,copper,ruby)) canCraft = longGoldRubySword;				                      // 90 + 20
-    else if (craftingCore(items,longGoldSword,copper,saphir)) canCraft = longGoldSaphirSword;			                    // 90 + 20
-    else if (craftingCore(items,longGoldSword,copper,amethyste)) canCraft = longGoldAmethysteSword;		                // 90 + 20
+    else if (craftingCore(items,baseGoldSword,gold,0)) canCraft = longGoldSword;									                    // 55 + 20 = 75
+    else if (craftingCore(items,longGoldSword,copper,ruby)) canCraft = longGoldRubySword;				                      // 90 + 30 = 120
+    else if (craftingCore(items,longGoldSword,copper,saphir)) canCraft = longGoldSaphirSword;			                    // 90 + 30 = 120
+    else if (craftingCore(items,longGoldSword,copper,amethyste)) canCraft = longGoldAmethysteSword;		                // 90 + 30 = 120
     // diamond
-    else if (craftingCore(items,baseDiamondSword,diamond,0)) canCraft = longDiamondSword;								              // 135 + 20
-    else if (craftingCore(items,longDiamondSword,copper,ruby)) canCraft = longDiamondRubySword;				                // 170 + 25
-    else if (craftingCore(items,longDiamondSword,copper,saphir)) canCraft = longDiamondSaphirSword;			              // 170 + 25
-    else if (craftingCore(items,longDiamondSword,copper,amethyste)) canCraft = longDiamondAmethysteSword;		          // 170 + 25
+    else if (craftingCore(items,baseDiamondSword,diamond,0)) canCraft = longDiamondSword;								              // 135 + 25 = 160
+    else if (craftingCore(items,longDiamondSword,copper,ruby)) canCraft = longDiamondRubySword;				                // 170 + 35 = 205
+    else if (craftingCore(items,longDiamondSword,copper,saphir)) canCraft = longDiamondSaphirSword;			              // 170 + 35 = 205
+    else if (craftingCore(items,longDiamondSword,copper,amethyste)) canCraft = longDiamondAmethysteSword;		          // 170 + 35 = 205
 
     // stage 3
     // iron
-    else if (craftingCore(items,longIronSword,baseIronSword,iron)) canCraft = bigIronSword;								          	// 40 + 20
-    else if (craftingCore(items,bigIronSword,copper,ruby)) canCraft = bigIronRubySword;				                        // 75 + 25
-    else if (craftingCore(items,bigIronSword,copper,saphir)) canCraft = bigIronSaphirSword;			                      // 75 + 25
-    else if (craftingCore(items,bigIronSword,copper,amethyste)) canCraft = bigIronAmethysteSword;		                  // 75 + 25
+    else if (craftingCore(items,longIronSword,baseIronSword,iron)) canCraft = bigIronSword;								          	// 40 + 35 = 75
+    else if (craftingCore(items,bigIronSword,copper,ruby)) canCraft = bigIronRubySword;				                        // 75 + 50 = 125
+    else if (craftingCore(items,bigIronSword,copper,saphir)) canCraft = bigIronSaphirSword;			                      // 75 + 50 = 125
+    else if (craftingCore(items,bigIronSword,copper,amethyste)) canCraft = bigIronAmethysteSword;		                  // 75 + 50 = 125
     // gold
-    else if (craftingCore(items,longGoldSword,baseGoldSword,gold)) canCraft = bigGoldSword;								            // 110 + 30
-    else if (craftingCore(items,bigGoldSword,copper,ruby)) canCraft = bigGoldRubySword;				                        // 145 + 35
-    else if (craftingCore(items,bigGoldSword,copper,saphir)) canCraft = bigGoldSaphirSword;			                      // 145 + 35
-    else if (craftingCore(items,bigGoldSword,copper,amethyste)) canCraft = bigGoldAmethysteSword;		                  // 145 + 35
+    else if (craftingCore(items,longGoldSword,baseGoldSword,gold)) canCraft = bigGoldSword;								            // 110 + 45 = 155
+    else if (craftingCore(items,bigGoldSword,copper,ruby)) canCraft = bigGoldRubySword;				                        // 145 + 60 = 205
+    else if (craftingCore(items,bigGoldSword,copper,saphir)) canCraft = bigGoldSaphirSword;			                      // 145 + 60 = 205
+    else if (craftingCore(items,bigGoldSword,copper,amethyste)) canCraft = bigGoldAmethysteSword;		                  // 145 + 60 = 205
     // diamond
-    else if (craftingCore(items,longDiamondSword,baseDiamondSword,diamond)) canCraft = bigDiamondSword;							  // 270 + 40
-    else if (craftingCore(items,bigDiamondSword,copper,ruby)) canCraft = bigDiamondRubySword;				                  // 305 + 45
-    else if (craftingCore(items,bigDiamondSword,copper,saphir)) canCraft = bigDiamondSaphirSword;			                // 305 + 45
-    else if (craftingCore(items,bigDiamondSword,copper,amethyste)) canCraft = bigDiamondAmethysteSword;		            // 305 + 45
+    else if (craftingCore(items,longDiamondSword,baseDiamondSword,diamond)) canCraft = bigDiamondSword;							  // 270 + 55 = 325
+    else if (craftingCore(items,bigDiamondSword,copper,ruby)) canCraft = bigDiamondRubySword;				                  // 305 + 70 = 375
+    else if (craftingCore(items,bigDiamondSword,copper,saphir)) canCraft = bigDiamondSaphirSword;			                // 305 + 70 = 375
+    else if (craftingCore(items,bigDiamondSword,copper,amethyste)) canCraft = bigDiamondAmethysteSword;		            // 305 + 70 = 375
 
     // stage 4
     // iron
-    else if (craftingCore(items,bigIronSword,bigIronSword,iron)) canCraft = cinquedaIronSword;									      // 90 + 45
-    else if (craftingCore(items,cinquedaIronSword,copper,ruby)) canCraft = cinquedaIronRubySword;				              // 125 + 50
-    else if (craftingCore(items,cinquedaIronSword,copper,saphir)) canCraft = cinquedaIronSaphirSword;			            // 125 + 50
-    else if (craftingCore(items,cinquedaIronSword,copper,amethyste)) canCraft = cinquedaIronAmethysteSword;		        // 125 + 50
+    else if (craftingCore(items,bigIronSword,bigIronSword,iron)) canCraft = cinquedaIronSword;									      // 90 + 90 = 180
+    else if (craftingCore(items,cinquedaIronSword,copper,ruby)) canCraft = cinquedaIronRubySword;				              // 125 + 110 = 235
+    else if (craftingCore(items,cinquedaIronSword,copper,saphir)) canCraft = cinquedaIronSaphirSword;			            // 125 + 110 = 235
+    else if (craftingCore(items,cinquedaIronSword,copper,amethyste)) canCraft = cinquedaIronAmethysteSword;		        // 125 + 110 = 235
     // gold
-    else if (craftingCore(items,bigGoldSword,bigGoldSword,gold)) canCraft = cinquedaGoldSword;									      // 240 + 65
-    else if (craftingCore(items,cinquedaGoldSword,copper,ruby)) canCraft = cinquedaGoldRubySword;				              // 275 + 70
-    else if (craftingCore(items,cinquedaGoldSword,copper,saphir)) canCraft = cinquedaGoldSaphirSword;			            // 275 + 70
-    else if (craftingCore(items,cinquedaGoldSword,copper,amethyste)) canCraft = cinquedaGoldAmethysteSword;		        // 275 + 70
+    else if (craftingCore(items,bigGoldSword,bigGoldSword,gold)) canCraft = cinquedaGoldSword;									      // 240 + 110 = 350
+    else if (craftingCore(items,cinquedaGoldSword,copper,ruby)) canCraft = cinquedaGoldRubySword;				              // 275 + 130 = 405
+    else if (craftingCore(items,cinquedaGoldSword,copper,saphir)) canCraft = cinquedaGoldSaphirSword;			            // 275 + 130 = 405
+    else if (craftingCore(items,cinquedaGoldSword,copper,amethyste)) canCraft = cinquedaGoldAmethysteSword;		        // 275 + 130 = 405
     // diamond
-    else if (craftingCore(items,bigDiamondSword,bigDiamondSword,gold)) canCraft = cinquedaDiamondSword;								// 590 + 85
-    else if (craftingCore(items,cinquedaDiamondSword,copper,ruby)) canCraft = cinquedaDiamondRubySword;				        // 625 + 90
-    else if (craftingCore(items,cinquedaDiamondSword,copper,saphir)) canCraft = cinquedaDiamondSaphirSword;			      // 625 + 90
-    else if (craftingCore(items,cinquedaDiamondSword,copper,amethyste)) canCraft = cinquedaDiamondAmethysteSword;	  	// 625 + 90
+    else if (craftingCore(items,bigDiamondSword,bigDiamondSword,gold)) canCraft = cinquedaDiamondSword;								// 590 + 130 = 720
+    else if (craftingCore(items,cinquedaDiamondSword,copper,ruby)) canCraft = cinquedaDiamondRubySword;				        // 625 + 150 = 775
+    else if (craftingCore(items,cinquedaDiamondSword,copper,saphir)) canCraft = cinquedaDiamondSaphirSword;			      // 625 + 150 = 775
+    else if (craftingCore(items,cinquedaDiamondSword,copper,amethyste)) canCraft = cinquedaDiamondAmethysteSword;	  	// 625 + 150 = 775
 
     // stage 5
     // gold
-    else if (craftingCore(items,cinquedaGoldSword,cinquedaGoldSword,copper)) canCraft = dragonGoldSword;						  // 485 + 130
-    else if (craftingCore(items,dragonGoldSword,copper,ruby)) canCraft = dragonGoldRubySword;				                  // 520 + 135
-    else if (craftingCore(items,dragonGoldSword,copper,saphir)) canCraft = dragonGoldSaphirSword;			                // 520 + 135
-    else if (craftingCore(items,dragonGoldSword,copper,amethyste)) canCraft = dragonGoldAmethysteSword;		            // 520 + 135
+    else if (craftingCore(items,cinquedaGoldSword,cinquedaGoldSword,copper)) canCraft = dragonGoldSword;						  // 485 + 245 = 730
+    else if (craftingCore(items,dragonGoldSword,copper,ruby)) canCraft = dragonGoldRubySword;				                  // 520 + 270 = 790
+    else if (craftingCore(items,dragonGoldSword,copper,saphir)) canCraft = dragonGoldSaphirSword;			                // 520 + 270 = 790
+    else if (craftingCore(items,dragonGoldSword,copper,amethyste)) canCraft = dragonGoldAmethysteSword;		            // 520 + 270 = 790
     // diamond
-    else if (craftingCore(items,dragonGoldSword,dragonGoldSword,cinquedaDiamondSword)) canCraft = dragonDiamondSword; // 1560 + 345
-    else if (craftingCore(items,dragonDiamondSword,copper,ruby)) canCraft = dragonDiamondRubySword;				            // 1595 + 350
-    else if (craftingCore(items,dragonDiamondSword,copper,saphir)) canCraft = dragonDiamondSaphirSword;			          // 1595 + 350
-    else if (craftingCore(items,dragonDiamondSword,copper,amethyste)) canCraft = dragonDiamondAmethysteSword;		      // 1595 + 350
+    else if (craftingCore(items,dragonGoldSword,dragonGoldSword,cinquedaDiamondSword)) canCraft = dragonDiamondSword; // 1560 + 645 = 2205
+    else if (craftingCore(items,dragonDiamondSword,copper,ruby)) canCraft = dragonDiamondRubySword;				            // 1595 + 670 = 2265
+    else if (craftingCore(items,dragonDiamondSword,copper,saphir)) canCraft = dragonDiamondSaphirSword;			          // 1595 + 670 = 2265
+    else if (craftingCore(items,dragonDiamondSword,copper,amethyste)) canCraft = dragonDiamondAmethysteSword;		      // 1595 + 670 = 2265
   }
 
 }

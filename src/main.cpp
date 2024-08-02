@@ -14,6 +14,8 @@ bool varBetween(int variable, int min, int max);
 void doubleClick(int *items, int currentTouch);
 int witchCase(int x, int y);
 
+#include "imagesIndex.cpp"
+
 int oldTouch = -1;
 int money = 0;
 float level = 1;
@@ -27,7 +29,7 @@ int clicks = 0;
 bool craftAnimation = 0;
 bool canContunueCraftAnimation = 0;
 
-#include "imagesIndex.cpp"
+
 #include "renderCore.cpp"
 #include "gameCore.cpp"
 
@@ -39,10 +41,17 @@ void buttonPressed(int x, int y, int items[]);
 SDL_Rect itemHighlight(int box);
 
 int main(int argc, char *argv[]) {
+  /*
+    Random
+  */
+
+  srand((unsigned) time(NULL));
   
   /*
     Les stats au démarage
   */
+
+  ask = baseIronRubySword;
   
   money = 300;
 
@@ -54,7 +63,7 @@ int main(int argc, char *argv[]) {
   items[4] = coal;
   items[5] = coal;
   
-  ask = askGenerator(level,money);
+  //ask = askGenerator(level,money,0);
   askPrice = sellPrice(ask,0);
   price = askPrice;
   
@@ -82,14 +91,16 @@ int main(int argc, char *argv[]) {
   SDL_Color color = { 255, 255, 255 };
 
   
-  
+
+  /*
+    Code principale
+  */
+
 
   SDL_Event event;
   bool programState = true;
   bool toRefresh = 1;
   bool minimized = 0;
-
-  unsigned long currentTouch;
   
   while(programState){
    
@@ -241,8 +252,7 @@ void buttonPressed(int x, int y, int items[]){
 
   int currentTouch = witchCase(x,y);
 
-  
-  std::cout << clicks;
+  std::cout << "level : " << level << " ask : " << ask << " clicks : " << clicks << "\n";
 
   if(page){
     std::cout << "shop : ";
@@ -275,9 +285,6 @@ void buttonPressed(int x, int y, int items[]){
           items[oldTouch] = items[currentTouch];
           items[currentTouch] = temp;
           oldTouch = -1;
-        }
-        else if(clicks == 2){  // en cas de double click
-          doubleClick(items,currentTouch);
         }
         else{
           oldTouch = currentTouch;
@@ -343,19 +350,16 @@ void buttonPressed(int x, int y, int items[]){
       else if(currentTouch == 29){ // touche pour achetter l'item séléctionné
         if(varBetween(oldTouch,21,28)){
           if(money >= price){
-            if(items[20] == 0){ // place l'item acheté dans la case shop si elle est vide
-              buy(items, oldTouch);
-            }
-            else{ // sinon déplace l'item acctuel dans l'inventaire et place l'item dans la case shop
-              for(int i = 0; i <= 15; i++){
+            bool findPlace = 0;
+            for(int i = 0; i <= 15; i++){ // met d'habort dans l'inventaire si possible
                 if(items[i] == 0){
-                  int temp = items[i];
-                  items[i] = items[20];
-                  items[20] = temp;
-                  buy(items,oldTouch);
+                  buy(items,oldTouch,i);
+                  findPlace = true;
                   break; 
                 }
               }
+            if (!findPlace && items[20] == 0){ // sinon met l'item dans la case shop
+              buy(items, oldTouch);
             }
           }
         }
@@ -366,8 +370,8 @@ void buttonPressed(int x, int y, int items[]){
       else if(currentTouch == 30){ // vend l'item dans la case shop
         if(items[20] == ask){ // si cela correspond à l'item demandé
           money += askPrice;
-          ask = askGenerator((int)level,money);
-          levelUpdate();
+          ask = askGenerator((int)level,money,levelUpdate());
+          
           askPrice = sellPrice(ask,0);
           items[20] = 0;
         }
@@ -414,34 +418,14 @@ void buttonPressed(int x, int y, int items[]){
 void doubleClick(int *items, int currentTouch){
 
   if(clicks == 2 && items[currentTouch] != 0 && currentTouch >= 0){
-      if(currentTouch <= 18){
-        if(!page && items[currentTouch] == coal){
-          int temp = items[32];
-          items[32] = items[currentTouch];
-          items[currentTouch] = temp;
-        }
-        if(!page){
-          for(int i = 16; i <= 18; i++){
-            if(items[i] == 0){
-              int temp = items[i];
-              items[i] = items[currentTouch];
-              items[currentTouch] = temp;
-              canCrafting(items);
-              break; 
-            }
-          }
-        }
-        else if(page){
-          if(items[20] == 0){
-            int temp = items[20];
-            items[20] = items[currentTouch];
-            items[currentTouch] = temp;
-            canCrafting(items);
-          }
-        }
+    if(currentTouch <= 15){
+      if(!page && items[currentTouch] == coal){
+        int temp = items[32];
+        items[32] = items[currentTouch];
+        items[currentTouch] = temp;
       }
-      else if(oldTouch <= 20){
-        for(int i = 0; i <= 15; i++){
+      if(!page){
+        for(int i = 16; i <= 18; i++){
           if(items[i] == 0){
             int temp = items[i];
             items[i] = items[currentTouch];
@@ -451,9 +435,29 @@ void doubleClick(int *items, int currentTouch){
           }
         }
       }
+      else if(page){
+        if(items[20] == 0){
+          int temp = items[20];
+          items[20] = items[currentTouch];
+          items[currentTouch] = temp;
+          canCrafting(items);
+        }
+      }
     }
-    
-    oldTouch = -1;
+    else if(oldTouch <= 20){
+      for(int i = 0; i <= 15; i++){
+        if(items[i] == 0){
+          int temp = items[i];
+          items[i] = items[currentTouch];
+          items[currentTouch] = temp;
+          canCrafting(items);
+          break; 
+        }
+      }
+    }
+  }
+  
+  oldTouch = -1;
 }
 
 /*
@@ -689,9 +693,9 @@ void SDL_ExitWithError(const char *message, SDL_Window *window, SDL_Renderer *re
 // compilation : 
 
 // windows : les dossier lib et includes doivent être présents; ajouter un fichier .dll dans le même dossier que l'executable
-// cd "f:\Mes Programes\C++\minigame\" ; if ($?) { g++ src\main.cpp -o main -I include -L lib -lmingw32 -lSDL2main -lSDL2} ; if ($?) { .\main }
+// cd "f:\Mes Programes\C++\minigame\" ; if ($?) { g++ src\main.cpp -o main -I include -L lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf} ; if ($?) { .\main }
 //
-// principal : g++ src\main.cpp -o main -I include -L lib -lmingw32 -lSDL2main -lSDL2
+// principal : g++ src\main.cpp -o main -I include -L lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
 // ajouter "-mwindows" pour que le terminale ne se lance pas
 
 // ubuntu (systeme unix) : les dossier lib et includes sont inutiles; le fichier sdl2-config est utile que pour la compilation
